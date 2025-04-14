@@ -2,6 +2,7 @@ package br.com.yan.screenmatch.principal;
 
 import br.com.yan.screenmatch.model.DadosEpisodio;
 import br.com.yan.screenmatch.model.DadosSerie;
+import br.com.yan.screenmatch.model.Episodio;
 import br.com.yan.screenmatch.service.ConsumoApi;
 import br.com.yan.screenmatch.service.ConverteDados;
 import br.com.yan.screenmatch.service.DadosTemporada;
@@ -72,6 +73,13 @@ public class Principal {
                     .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
                     .limit(5)
                     .forEach(System.out::println);
+
+            List<Episodio> episodios = temporadas.stream()
+                    .flatMap(t -> t.episodios().stream()
+                            .map(d->new Episodio(t.numero(),d)))
+                    .collect(Collectors.toList());
+
+            episodios.forEach(System.out::println);
         }
     }
 
