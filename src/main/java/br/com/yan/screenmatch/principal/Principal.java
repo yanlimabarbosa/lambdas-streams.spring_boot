@@ -10,8 +10,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -48,8 +50,7 @@ public class Principal {
             int totalTemporadas = dadosSerie.totalTemporadas();
             for (int i = 1; i <= totalTemporadas; i++) {
                 // Construct URL for each season.
-                String seasonUrl = String.format(
-                        BASE_URL + encodedNomeSerie + "&season=%d" + API_KEY_QUERY, i);
+                String seasonUrl = String.format(BASE_URL + encodedNomeSerie + "&season=%d" + API_KEY_QUERY, i);
                 String jsonTemporada = consumoApi.obterDados(seasonUrl);
                 DadosTemporada temporada = conversor.obterDados(jsonTemporada, DadosTemporada.class);
                 if (temporada != null) {
@@ -57,7 +58,20 @@ public class Principal {
                 }
             }
 
-            temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titulo())));
+            temporadas
+                    .forEach(t -> t.episodios()
+                        .forEach(e -> System.out.println(e.titulo())));
+
+            List<DadosEpisodio> dadosEpisodios = temporadas
+                            .stream().flatMap(t -> t.episodios().stream())
+                            .collect(Collectors.toList());
+
+            System.out.println("\nTop 5 episódios");
+            dadosEpisodios.stream()
+                    .filter(e -> !e.avaliacao().equals("N/A"))
+                    .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
+                    .limit(5)
+                    .forEach(System.out::println);
         }
     }
 
