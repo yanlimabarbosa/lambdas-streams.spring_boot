@@ -6,10 +6,10 @@ import br.com.yan.screenmatch.model.Episodio;
 import br.com.yan.screenmatch.service.ConsumoApi;
 import br.com.yan.screenmatch.service.ConverteDados;
 import br.com.yan.screenmatch.service.DadosTemporada;
+import br.com.yan.screenmatch.util.UrlEncoderUtil;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +34,7 @@ public class Principal {
             System.out.print("Digite o nome da série que deseja buscar: ");
             String nomeSerie = leitura.nextLine().trim();
 
-            String encodedNomeSerie = encodeValue(nomeSerie);
+            String encodedNomeSerie = UrlEncoderUtil.encode(nomeSerie);
             String seriesUrl = BASE_URL + encodedNomeSerie + API_KEY_QUERY;
 
             String jsonSerie = consumoApi.obterDados(seriesUrl);
@@ -61,11 +61,11 @@ public class Principal {
 
             temporadas
                     .forEach(t -> t.episodios()
-                        .forEach(e -> System.out.println(e.titulo())));
+                            .forEach(e -> System.out.println(e.titulo())));
 
             List<DadosEpisodio> dadosEpisodios = temporadas
-                            .stream().flatMap(t -> t.episodios().stream())
-                            .collect(Collectors.toList());
+                    .stream().flatMap(t -> t.episodios().stream())
+                    .collect(Collectors.toList());
 
             System.out.println("\nTop 5 episódios");
             dadosEpisodios.stream()
@@ -76,20 +76,26 @@ public class Principal {
 
             List<Episodio> episodios = temporadas.stream()
                     .flatMap(t -> t.episodios().stream()
-                            .map(d->new Episodio(t.numero(),d)))
+                            .map(d -> new Episodio(t.numero(), d)))
                     .collect(Collectors.toList());
 
             episodios.forEach(System.out::println);
-        }
-    }
 
-    // Helper method to URL-encode input strings.
-    private String encodeValue(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            // This exception should not occur with UTF-8 encoding.
-            throw new RuntimeException("Erro ao codificar o valor: " + value, ex);
+            System.out.println("A partir de que ano você deseja ver os episódios?");
+            var ano = leitura.nextInt();
+            leitura.nextLine();
+
+            LocalDate dataBusca = LocalDate.of(ano, 1, 1);
+
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            episodios.stream()
+                    .filter(e -> e.getDataLancamento() != null && e.getDataLancamento().isAfter(dataBusca))
+                    .forEach(e-> {
+                        System.out.println(
+                            "Temporada: " + e.getTemporada() +
+                            " Episódio: " + e.getTitulo() +
+                            " Data lançamento: " + e.getDataLancamento().format(formatador));
+                    });
         }
     }
 }
