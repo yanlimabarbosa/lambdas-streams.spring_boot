@@ -7,10 +7,7 @@ import br.com.yan.screenmatch.service.ConverteDados;
 import br.com.yan.screenmatch.service.DadosTemporada;
 import br.com.yan.screenmatch.util.UrlEncoderUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -69,7 +66,7 @@ public class Principal {
 //                    .filter(e -> !e.avaliacao().equals("N/A"))
 //                    .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
 //                    .limit(5)
-//                    .forEach(System.out::println);
+//                    .forEach(Sys  tem.out::println);
 
             List<Episodio> episodios = temporadas.stream()
                     .flatMap(t -> t.episodios().stream()
@@ -103,18 +100,26 @@ public class Principal {
 //                    .forEach(e-> {
 //                        System.out.println(
 //                            "Temporada: " + e.getTemporada() +
-//                            " Episódio: " + e.getTitulo() +
+//                            " Episódio: " + e.getTitulo() ++
 //                            " Data lançamento: " + e.getDataLancamento().format(formatador));
 //                    });
 
-            System.out.println(episodios);
-            Map<Integer, Double> avaliacoesPorTemporada = episodios.stream()
+//            System.out.println(episodios);
+//            Map<Integer, Double> avaliacoesPorTemporada = episodios.stream()
+//                    .filter(e -> e.getAvaliacao() > 0.0)
+//                    .collect(Collectors.groupingBy(Episodio::getTemporada,
+//                            Collectors.averagingDouble(Episodio::getAvaliacao)));
+//
+//            System.out.println(avaliacoesPorTemporada);
+
+            DoubleSummaryStatistics est = episodios.stream()
                     .filter(e -> e.getAvaliacao() > 0.0)
-                    .collect(Collectors.groupingBy(Episodio::getTemporada,
-                            Collectors.averagingDouble(Episodio::getAvaliacao)));
+                    .collect(Collectors.summarizingDouble(Episodio::getAvaliacao));
 
-            System.out.println(avaliacoesPorTemporada);
-
+            System.out.println("Média: " + est.getAverage());
+            System.out.println("Melhor Episódio: " + est.getMax());
+            System.out.println("Pior Episódio: " + est.getMin());
+            System.out.println("Quantidade: " + est.getCount());
         }
     }
 }
