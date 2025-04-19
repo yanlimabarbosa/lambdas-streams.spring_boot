@@ -1,6 +1,6 @@
 package com.yan.TabelaFipe;
 
-import com.yan.TabelaFipe.service.Principal;
+import com.yan.TabelaFipe.principal.Principal;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,7 +1,9 @@
-package com.yan.TabelaFipe.service;
+package com.yan.TabelaFipe.principal;
 
 import com.yan.TabelaFipe.model.Dados;
 import com.yan.TabelaFipe.model.Modelos;
+import com.yan.TabelaFipe.service.ConsumoApi;
+import com.yan.TabelaFipe.service.ConverteDados;
 
 import java.util.Comparator;
 import java.util.Scanner;
